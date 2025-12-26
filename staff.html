@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>لوحة التحكم وقود – اللواء 604</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --gold:#C9A35E; --gold2:#9E7A3A;
+      --green:#1F7A3F; --green2:#14532D;
+      --cyan:#38bdf8;
+
+      --bg0:#030712; --bg1:#071021; --bg2:#0b1630;
+      --text:#f8fafc; --muted:#cbd5e1;
+
+      --glass:rgba(255,255,255,.06);
+      --stroke:rgba(255,255,255,.12);
+      --strokeGold:rgba(201,163,94,.36);
+
+      --shadow:0 40px 140px rgba(0,0,0,.75);
+      --shadow2:0 18px 70px rgba(0,0,0,.55);
+      --r:24px;
+
+      --good:#22c55e; --bad:#ef4444; --warn:#f59e0b;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Cairo",sans-serif;
+      color:var(--text);
+      background: linear-gradient(180deg, var(--bg0), var(--bg1), var(--bg2));
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    /* خلفية متناظرة */
+    .bg{position:fixed; inset:0; pointer-events:none; z-index:0;}
+    .bg:before{
+      content:""; position:absolute; inset:-140px;
+      background:
+        radial-gradient(circle at 22% 28%, rgba(201,163,94,.18), transparent 56%),
+        radial-gradient(circle at 78% 28%, rgba(201,163,94,.18), transparent 56%),
+        radial-gradient(circle at 22% 78%, rgba(56,189,248,.10), transparent 58%),
+        radial-gradient(circle at 78% 78%, rgba(56,189,248,.10), transparent 58%),
+        radial-gradient(circle at 50% 55%, rgba(34,197,94,.08), transparent 60%);
+      filter: blur(38px);
+      opacity:.95;
+    }
+    .bg:after{
+      content:""; position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 64px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 64px);
+      opacity:.06;
+      mask-image: radial-gradient(circle at 50% 40%, rgba(0,0,0,1), rgba(0,0,0,.25) 65%, transparent 84%);
+    }
+
+    .stage{position:relative; z-index:1; min-height:100svh; padding:clamp(12px,2.4vw,24px);}
+    .container{width:min(1180px,100%); margin:0 auto;}
+
+    .topbar{
+      border-radius:26px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow:var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      position:relative;
+      overflow:hidden;
+    }
+    .topbar:before{
+      content:"";
+      position:absolute; inset:0 0 auto 0; height:6px;
+      background: linear-gradient(90deg,
+        rgba(201,163,94,0),
+        rgba(201,163,94,.95),
+        rgba(255,255,255,.22),
+        rgba(201,163,94,.95),
+        rgba(201,163,94,0)
+      );
+      opacity:.95; pointer-events:none;
+    }
+
+    .brand{display:flex; align-items:center; gap:12px; min-width:min(560px,100%);}
+    .logoWrap{width:54px;height:54px; position:relative; display:grid; place-items:center; flex:0 0 auto;}
+    .logoWrap:before{
+      content:""; position:absolute; inset:-14px; border-radius:20px;
+      background: conic-gradient(from 220deg,
+        rgba(201,163,94,0),
+        rgba(201,163,94,.70),
+        rgba(56,189,248,.18),
+        rgba(201,163,94,.70),
+        rgba(201,163,94,0)
+      );
+      filter: blur(14px);
+      opacity:.65;
+    }
+    .logo{width:52px;height:52px;border-radius:16px; overflow:hidden; border:1px solid rgba(201,163,94,.58); background:rgba(255,255,255,.06); position:relative; z-index:1;}
+    .logo img{width:100%;height:100%;object-fit:cover}
+
+    .title h1{margin:0; font-size:18px; font-weight:900; letter-spacing:.2px}
+    .title p{margin:4px 0 0; font-size:12px; color:rgba(203,213,225,.90); line-height:1.6}
+
+    .pill{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-start;
+      padding:10px 12px; border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      box-shadow: 0 12px 40px rgba(0,0,0,.35);
+      color:rgba(203,213,225,.92);
+      font-size:12px;
+    }
+    .dot{width:8px;height:8px;border-radius:999px;background:rgba(34,197,94,.95);box-shadow:0 0 0 6px rgba(34,197,94,.10);}
+    .who{font-weight:900; color:#fff}
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap}
+    .btnS{
+      border:none; cursor:pointer;
+      padding:10px 14px;
+      border-radius:16px;
+      font-family:"Cairo",sans-serif;
+      font-weight:900;
+      font-size:13px;
+      min-height:42px;
+      transition:.15s ease;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);
+    }
+    .btnS:active{transform:translateY(1px) scale(.99)}
+    .btnS.gold{
+      color:#0b0b0b;
+      background: linear-gradient(135deg, var(--gold), rgba(34,197,94,.16));
+      border-color: rgba(201,163,94,.30);
+    }
+    .btnS.red{
+      background: rgba(239,68,68,.14);
+      border-color: rgba(239,68,68,.30);
+    }
+
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+    }
+
+    .card{
+      grid-column: span 4;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(620px 220px at 50% 0%, rgba(255,255,255,.06), transparent 60%),
+        rgba(15,23,42,.72);
+      box-shadow:var(--shadow2);
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+      min-height:140px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .card:after{
+      content:"";
+      position:absolute; inset:12px;
+      border-radius:16px;
+      border:1px solid rgba(201,163,94,.14);
+      pointer-events:none;
+      opacity:.9;
+    }
+
+    .kicker{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      position:relative; z-index:1;
+    }
+    .tag{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:rgba(203,213,225,.92);
+      white-space:nowrap;
+    }
+    .ico{
+      width:44px;height:44px;border-radius:16px;
+      display:grid;place-items:center;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      font-size:18px;
+      position:relative; z-index:1;
+    }
+
+    .card h2{margin:0; font-size:16px; font-weight:900; position:relative; z-index:1;}
+    .card p{margin:0; font-size:12px; color:rgba(203,213,225,.88); line-height:1.8; position:relative; z-index:1;}
+
+    .go{
+      width:100%;
+      border:none; cursor:pointer;
+      padding:12px 14px;
+      border-radius:18px;
+      font-family:"Cairo",sans-serif;
+      font-weight:900;
+      font-size:13.5px;
+      min-height:46px;
+      transition:.15s ease;
+      position:relative;
+      overflow:hidden;
+      z-index:1;
+    }
+    .go:active{transform:translateY(1px) scale(.99)}
+    .go:before{
+      content:"";
+      position:absolute; inset:-60px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), transparent 55%);
+      transform: rotate(12deg);
+      opacity:.35;
+      pointer-events:none;
+    }
+    .go.gold{
+      color:#0b0b0b;
+      background: linear-gradient(135deg, var(--gold), rgba(34,197,94,.16));
+      box-shadow: 0 16px 60px rgba(201,163,94,.18), inset 0 1px 0 rgba(255,255,255,.35);
+    }
+    .go.green{
+      color:#fff;
+      background: linear-gradient(135deg, var(--green), rgba(56,189,248,.14));
+      box-shadow: 0 16px 60px rgba(31,122,63,.18), inset 0 1px 0 rgba(255,255,255,.22);
+    }
+    .go.ghost{
+      color:var(--text);
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .foot{
+      margin-top:12px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(203,213,225,.78);
+      opacity:.95;
+    }
+
+    @media (max-width: 980px){
+      .card{grid-column: span 6;}
+    }
+    @media (max-width: 620px){
+      .card{grid-column: span 12;}
+      .title h1{font-size:17px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+
+  <div class="stage">
+    <div class="container">
+
+      <div class="topbar">
+        <div class="brand">
+          <div class="logoWrap"><div class="logo"><img src="604.png" alt="شعار اللواء"></div></div>
+          <div class="title">
+            <h1>لوحة تحكم الوقود</h1>
+            <p id="welcomeLine">مرحباً…</p>
+          </div>
+        </div>
+
+        <div class="pill">
+          <span class="dot"></span>
+          <span>حالة النظام:</span>
+          <span class="who">تشغيل</span>
+          <span>•</span>
+          <span id="roleLine">—</span>
+        </div>
+
+        <div class="actions">
+          <button class="btnS" onclick="location.href='home.html'">الرئيسية</button>
+          <button class="btnS red" id="logoutBtn">خروج</button>
+        </div>
+      </div>
+
+      <div class="grid">
+
+        <div class="card">
+          <div class="kicker">
+            <span class="tag">⛽ عمليات</span>
+            <div class="ico">⛽</div>
+          </div>
+          <div>
+            <h2>إضافة عملية تعبئة</h2>
+            <p>تسجيل عمليات التعبئة اليومية وربطها بالسائق/السيارة.</p>
+          </div>
+          <button class="go gold" onclick="location.href='fuel-ops.html'">فتح الصفحة</button>
+        </div>
+
+        <div class="card">
+          <div class="kicker">
+            <span class="tag">🚗 السيارات</span>
+            <div class="ico">🚗</div>
+          </div>
+          <div>
+            <h2>إضافة / تعديل سيارة</h2>
+            <p>ملف مستقل للسيارات: رقم اللوحة، النوع، الحالة…</p>
+          </div>
+          <button class="go green" onclick="location.href='cars.html'">فتح الصفحة</button>
+        </div>
+        <div class="card">
+          <div class="kicker">
+            <span class="tag">📊 التقارير</span>
+            <div class="ico">📊</div>
+          </div>
+          <div>
+            <h2>التقارير</h2>
+            <p>تقارير شهرية / إجماليات / تصفية حسب سيارة أو سائق.</p>
+          </div>
+          <button class="go ghost" onclick="location.href='reports.html'">فتح الصفحة</button>
+        </div>
+
+        <div class="card" id="adminCard" style="display:none">
+          <div class="kicker">
+            <span class="tag">🔐 ADMIN</span>
+            <div class="ico">🔐</div>
+          </div>
+          <div>
+            <h2>إدارة المستخدمين</h2>
+            <p>إضافة/تعديل/تعطيل المستخدمين — للمدير فقط.</p>
+          </div>
+          <button class="go gold" onclick="location.href='users.html'">فتح الصفحة</button>
+        </div>
+
+      </div>
+
+      <div class="foot">© اللواء 604 — إدارة الوقود</div>
+    </div>
+  </div>
+
+<script>
+  // حماية: لو مافيش مستخدم يرجع للدخول
+  const user = JSON.parse(localStorage.getItem("fuel_user") || "null");
+  if(!user){
+    location.href = "staff-login.html";
+  }
+
+  // عرض الترحيب/الدور
+  const welcomeLine = document.getElementById("welcomeLine");
+  const roleLine = document.getElementById("roleLine");
+  const adminCard = document.getElementById("adminCard");
+
+  const name = user?.full_name || user?.name || user?.username || "مستخدم";
+  const role = (user?.role || user?.user_role || "").toString().toLowerCase();
+
+  welcomeLine.textContent = `مرحباً ${name} — اختر العملية من الأزرار.`;
+  roleLine.textContent = role ? `الصلاحية: ${role.toUpperCase()}` : "الصلاحية: —";
+
+  // إظهار كرت الإدارة فقط لو ADMIN
+  if(role === "admin" || role === "administrator"){
+    adminCard.style.display = "flex";
+  }
+
+  // خروج
+  document.getElementById("logoutBtn").addEventListener("click", ()=>{
+    localStorage.removeItem("fuel_user");
+    location.href = "staff-login.html";
+  });
+</script>
+</body>
+</html>

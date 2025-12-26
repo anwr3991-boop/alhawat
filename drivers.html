@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>السائقين – اللواء 604</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --gold:#C9A35E; --cyan:#38bdf8;
+      --bg0:#030712; --bg1:#071021; --bg2:#0b1630;
+      --text:#f8fafc; --muted:#cbd5e1;
+      --shadow:0 18px 70px rgba(0,0,0,.55);
+      --r:22px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Cairo",sans-serif;color:var(--text);background:linear-gradient(180deg,var(--bg0),var(--bg1),var(--bg2));}
+    .bg{position:fixed;inset:0;pointer-events:none;z-index:0;}
+    .bg:before{content:"";position:absolute;inset:-140px;background:
+      radial-gradient(circle at 30% 30%, rgba(56,189,248,.12), transparent 58%),
+      radial-gradient(circle at 70% 75%, rgba(201,163,94,.14), transparent 56%);
+      filter:blur(38px);opacity:.95;}
+    .stage{position:relative;z-index:1;min-height:100svh;padding:clamp(12px,2.4vw,24px);}
+    .container{width:min(980px,100%);margin:0 auto;}
+    .bar{
+      border-radius:24px;border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);backdrop-filter:blur(14px);
+      padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      position:relative;overflow:hidden;
+    }
+    .bar:before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:linear-gradient(90deg,rgba(201,163,94,0),rgba(201,163,94,.95),rgba(255,255,255,.22),rgba(201,163,94,.95),rgba(201,163,94,0));opacity:.95;}
+    .brand{display:flex;align-items:center;gap:12px;}
+    .logo{width:46px;height:46px;border-radius:16px;overflow:hidden;border:1px solid rgba(201,163,94,.55);background:rgba(255,255,255,.06)}
+    .logo img{width:100%;height:100%;object-fit:cover}
+    h1{margin:0;font-size:16px;font-weight:900}
+    .sub{margin:4px 0 0;color:rgba(203,213,225,.88);font-size:12px}
+    .btn{border:none;cursor:pointer;padding:10px 14px;border-radius:16px;font-family:"Cairo",sans-serif;font-weight:900;font-size:13px;min-height:42px;transition:.15s ease;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--text);}
+    .btn:active{transform:translateY(1px) scale(.99)}
+    .btn.gold{color:#0b0b0b;background:linear-gradient(135deg,var(--gold), rgba(56,189,248,.14));border-color:rgba(201,163,94,.28)}
+    .card{margin-top:14px;border-radius:24px;border:1px solid rgba(255,255,255,.12);background:rgba(15,23,42,.72);box-shadow:var(--shadow);padding:16px;}
+    label{display:block;margin:10px 0 6px;color:rgba(203,213,225,.92);font-size:12px}
+    input,select{width:100%;padding:13px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--text);outline:none;font-family:"Cairo",sans-serif;font-size:14px;}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:720px){.row{grid-template-columns:1fr}}
+    .foot{margin-top:10px;text-align:center;color:rgba(203,213,225,.78);font-size:11px}
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="stage">
+    <div class="container">
+
+      <div class="bar">
+        <div class="brand">
+          <div class="logo"><img src="604.png" alt="شعار اللواء"></div>
+          <div>
+            <h1>السائقين</h1>
+            <div class="sub">إضافة / تعديل سائق — ملف مستقل</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" onclick="location.href='staff.html'">رجوع للداش</button>
+          <button class="btn gold" id="saveBtn">حفظ</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row">
+          <div>
+            <label>اسم السائق</label>
+            <input id="name" placeholder="مثال: محمد سالم">
+          </div>
+          <div>
+            <label>رقم عسكري</label>
+            <input id="mil" placeholder="مثال: 604-1234">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>رقم الهاتف</label>
+            <input id="phone" inputmode="tel" placeholder="09xxxxxxxx">
+          </div>
+          <div>
+            <label>الحالة</label>
+            <select id="status">
+              <option value="نشط">نشط</option>
+              <option value="موقوف">موقوف</option>
+            </select>
+          </div>
+        </div>
+
+        <label>ملاحظات</label>
+        <input id="note" placeholder="أي ملاحظة…">
+
+        <div class="foot">نربطها لاحقاً بشيت Drivers عبر API.</div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  const user = JSON.parse(localStorage.getItem("fuel_user") || "null");
+  if(!user) location.href = "staff-login.html";
+
+  document.getElementById("saveBtn").addEventListener("click", ()=>{
+    alert("✅ تم (تجريبي) — اربطها بالـ API وقت تجهز.");
+  });
+</script>
+</body>
+</html>

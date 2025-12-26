@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>السيارات – اللواء 604</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --gold:#C9A35E; --gold2:#9E7A3A;
+      --bg0:#030712; --bg1:#071021; --bg2:#0b1630;
+      --stroke:rgba(255,255,255,.12);
+      --text:#f8fafc; --muted:#cbd5e1;
+      --shadow:0 22px 90px rgba(0,0,0,.65);
+      --r:24px;
+      --good:#22c55e; --bad:#ef4444; --warn:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Cairo",sans-serif;
+      color:var(--text);
+      background: linear-gradient(180deg,var(--bg0),var(--bg1),var(--bg2));
+      overflow-x:hidden;
+    }
+    .bg{position:fixed;inset:0;pointer-events:none;z-index:0;}
+    .bg:before{
+      content:"";
+      position:absolute; inset:-160px;
+      background:
+        radial-gradient(circle at 22% 25%, rgba(201,163,94,.18), transparent 58%),
+        radial-gradient(circle at 78% 70%, rgba(34,197,94,.08), transparent 60%),
+        radial-gradient(circle at 50% 110%, rgba(56,189,248,.06), transparent 62%);
+      filter: blur(40px);
+      opacity:.95;
+    }
+    .stage{position:relative;z-index:1;min-height:100svh;padding:clamp(12px,2.4vw,24px);}
+    .container{width:min(1050px,100%);margin:0 auto;}
+    .bar{
+      border-radius:26px;
+      border:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(14px);
+      padding:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      position:relative;
+      overflow:hidden;
+    }
+    .bar:before{
+      content:"";
+      position:absolute; inset:0 0 auto 0;
+      height:6px;
+      background:linear-gradient(90deg,rgba(201,163,94,0),rgba(201,163,94,.95),rgba(255,255,255,.20),rgba(201,163,94,.95),rgba(201,163,94,0));
+      opacity:.95;
+    }
+    .brand{display:flex;align-items:center;gap:12px;}
+    .logo{
+      width:48px;height:48px;border-radius:16px;overflow:hidden;
+      border:1px solid rgba(201,163,94,.60);
+      background:rgba(255,255,255,.06);
+      box-shadow:0 16px 40px rgba(0,0,0,.35);
+      flex:0 0 auto;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+    h1{margin:0;font-size:16px;font-weight:900}
+    .sub{margin:4px 0 0;color:rgba(203,213,225,.88);font-size:12px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{
+      border:none;cursor:pointer;
+      padding:10px 14px;
+      border-radius:16px;
+      font-family:"Cairo",sans-serif;
+      font-weight:900;
+      font-size:13px;
+      min-height:42px;
+      transition:.15s ease;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);
+    }
+    .btn:active{transform:translateY(1px) scale(.99)}
+    .btn.gold{
+      color:#0b0b0b;
+      background:linear-gradient(135deg,var(--gold), rgba(34,197,94,.16));
+      border-color:rgba(201,163,94,.30)
+    }
+    /* ✅ زر صوت أيقونة فقط */
+    .btn.icon{
+      width:46px;
+      padding:0;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+    }
+
+    .card{
+      margin-top:14px;
+      border-radius:26px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(15,23,42,.72);
+      box-shadow:var(--shadow);
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(700px 220px at 50% 0%, rgba(201,163,94,.12), transparent 60%);
+      pointer-events:none;
+    }
+    .card > *{position:relative; z-index:1;}
+    label{
+      display:block;
+      margin:10px 0 6px;
+      color:rgba(203,213,225,.92);
+      font-size:12px
+    }
+    input,select{
+      width:100%;
+      padding:13px 14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      outline:none;
+      font-family:"Cairo",sans-serif;
+      font-size:14px;
+      transition:.15s ease;
+    }
+    input:focus,select:focus{
+      border-color: rgba(201,163,94,.60);
+      box-shadow: 0 0 0 6px rgba(201,163,94,.10);
+      background:rgba(255,255,255,.06);
+    }
+    select{
+      -webkit-appearance:none;
+      appearance:none;
+      padding-left:42px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,.75) 50%),
+        linear-gradient(135deg, rgba(255,255,255,.75) 50%, transparent 50%);
+      background-position:left 18px center,left 12px center;
+      background-size:6px 6px,6px 6px;
+      background-repeat:no-repeat;
+    }
+    select option{background:#0b1630;color:#f8fafc;}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    @media(max-width:900px){.row3{grid-template-columns:1fr 1fr}}
+    @media(max-width:720px){.row3{grid-template-columns:1fr}}
+    .inline{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:10px;
+    }
+    .pill{
+      padding:10px 12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:rgba(203,213,225,.92);
+      font-size:12px;
+    }
+    .pill strong{color:#fff}
+    .msg{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:12px;
+      display:none;
+      line-height:1.9;
+    }
+    .msg.show{display:block}
+    .msg.ok{border-color:rgba(34,197,94,.55);color:#d1fae5}
+    .msg.bad{border-color:rgba(239,68,68,.55);color:#fee2e2}
+    .msg.warn{border-color:rgba(245,158,11,.55);color:#fff7ed}
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+  <div class="stage">
+    <div class="container">
+
+      <div class="bar">
+        <div class="brand">
+          <div class="logo"><img src="604.png" alt="شعار اللواء"></div>
+          <div>
+            <h1>إدارة السيارات</h1>
+            <div class="sub">إضافة / تعديل سيارة</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" onclick="location.href='staff.html'">رجوع</button>
+          <button class="btn" id="newBtn">سيارة جديدة</button>
+
+          <!-- ✅ زر صوت أيقونة فقط -->
+          <button class="btn icon" id="soundBtn" title="تشغيل/كتم الصوت" aria-label="تشغيل/كتم الصوت">🔊</button>
+
+          <button class="btn gold" id="saveBtn">حفظ</button>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="row3">
+          <div>
+            <label>اختيار سيارة (اختياري)</label>
+            <select id="pick"></select>
+          </div>
+
+          <div>
+            <label>بحث سريع برقم السيارة</label>
+            <input id="vehicle_no_search" list="vehNoList" placeholder="اكتب رقم/جزء من الرقم…">
+            <datalist id="vehNoList"></datalist>
+          </div>
+
+          <div>
+            <label>رقم السيارة</label>
+            <input id="vehicle_no" placeholder="مثال: 444">
+          </div>
+        </div>
+
+        <div class="row3">
+          <div>
+            <label>اسم السيارة</label>
+            <input id="vehicle_name" placeholder="مثال: كيا سراو / نوفا...">
+          </div>
+          <div>
+            <label>رقم اللوحة</label>
+            <input id="plate_no" placeholder="مثال: 5050">
+          </div>
+          <div>
+            <label>التبعية</label>
+            <input id="unit" placeholder="مثال: السرية 18">
+          </div>
+        </div>
+
+        <div class="row3">
+          <div>
+            <label>نوع الوقود</label>
+            <select id="fuel_type">
+              <option value="">— اختر —</option>
+              <option value="بنزين">بنزين</option>
+              <option value="ديزل">ديزل</option>
+            </select>
+          </div>
+          <div>
+            <label>رقم السائق</label>
+            <input id="driver_id" placeholder="مثال: 2">
+          </div>
+          <div>
+            <label>اسم السواق</label>
+            <input id="driver_name_in" placeholder="مثال: أيوب...">
+          </div>
+        </div>
+
+        <div class="row3">
+          <div>
+            <label>هاتف السواق (اختياري)</label>
+            <input id="driver_phone" placeholder="مثال: 091xxxxxxx">
+          </div>
+          <div>
+            <label>هل السيارة دورية؟</label>
+            <select id="is_periodic">
+              <option value="">—</option>
+              <option value="TRUE">TRUE</option>
+              <option value="FALSE">FALSE</option>
+            </select>
+          </div>
+          <div>
+            <label>نمط الدورية</label>
+            <select id="periodic_mode">
+              <option value="">—</option>
+              <option value="EVERY_N_DAYS">EVERY_N_DAYS</option>
+              <option value="EVERY_N_WEEKS">EVERY_N_WEEKS</option>
+              <option value="EVERY_N_MONTHS">EVERY_N_MONTHS</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row3">
+          <div>
+            <label>قيمة الدورية</label>
+            <input id="periodic_value" placeholder="مثال: 3">
+          </div>
+          <div>
+            <label>اليوم الدوري</label>
+            <input id="periodic_day" placeholder="مثال: 5 أو الأحد">
+          </div>
+          <div>
+            <label>التفعيل</label>
+            <select id="active">
+              <option value="TRUE">TRUE</option>
+              <option value="FALSE">FALSE</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ✅ تحت: وضع الصفحة + ID + آخر تعديل + بواسطة -->
+        <div class="inline">
+          <div class="pill">وضع الصفحة: <strong id="modeText">—</strong></div>
+          <div class="pill">ID داخلي: <strong id="vidText">—</strong></div>
+          <div class="pill">آخر تعديل: <strong id="createdAtText">—</strong></div>
+          <div class="pill">بواسطة: <strong id="createdByText">—</strong></div>
+        </div>
+
+        <div class="msg" id="msg"></div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbwfjjD3s2QEXsX22_oCA7x0SMMevFbG-IoWFNrFn0yfnd60ryD9PbKEXa0cM-gMMZh5/exec";
+
+  const user = JSON.parse(localStorage.getItem("fuel_user") || "null");
+  if(!user) location.href = "staff-login.html";
+
+  function jsonp(params){
+    return new Promise((resolve, reject)=>{
+      const cb = "cb_" + Math.random().toString(36).slice(2);
+      params.callback = cb;
+      const s = document.createElement("script");
+      s.src = API_URL + "?" + new URLSearchParams(params).toString();
+      window[cb] = (data)=>{ resolve(data); delete window[cb]; s.remove(); };
+      s.onerror = ()=>{ reject(new Error("JSONP failed")); delete window[cb]; s.remove(); };
+      document.body.appendChild(s);
+    });
+  }
+
+  const el = (id)=>document.getElementById(id);
+  const msg = el("msg");
+
+  const pick = el("pick");
+  const vehicle_no_search = el("vehicle_no_search");
+  const vehNoList = el("vehNoList");
+
+  const vehicle_no = el("vehicle_no");
+  const vehicle_name = el("vehicle_name");
+  const plate_no = el("plate_no");
+  const unit = el("unit");
+  const fuel_type = el("fuel_type");
+
+  const driver_id = el("driver_id");
+  const driver_name_in = el("driver_name_in");
+  const driver_phone = el("driver_phone");
+
+  const is_periodic = el("is_periodic");
+  const periodic_mode = el("periodic_mode");
+  const periodic_value = el("periodic_value");
+  const periodic_day = el("periodic_day");
+  const active = el("active");
+
+  const modeText = el("modeText");
+  const vidText = el("vidText");
+
+  // ✅ الجديد للعرض
+  const createdAtText = el("createdAtText");
+  const createdByText = el("createdByText");
+
+  let VEHICLES = [];
+  let MODE = "NEW";
+  let CURRENT_ID = "";
+
+  /***********************
+   * 🔊 Sound System (No files)
+   ***********************/
+  const Sound = (() => {
+    let ctx = null;
+    let enabled = (localStorage.getItem("vehicles_sound") || "ON") === "ON";
+
+    function ensureCtx(){
+      if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if(ctx.state === "suspended") ctx.resume().catch(()=>{});
+    }
+    function beep(freq=440, dur=0.08, type="sine", gain=0.18){
+      if(!enabled) return;
+      try{
+        ensureCtx();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+
+        const now = ctx.currentTime;
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(gain, now + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        o.connect(g); g.connect(ctx.destination);
+        o.start(now);
+        o.stop(now + dur + 0.02);
+      }catch(e){}
+    }
+    function seq(list){
+      if(!enabled) return;
+      let t = 0;
+      list.forEach(s=>{
+        setTimeout(()=>beep(s.f, s.d, s.t, s.g), t);
+        t += Math.max(40, Math.floor((s.d || 0.08) * 1000));
+      });
+    }
+    function vibrate(ms=30){
+      if(!enabled) return;
+      if(navigator.vibrate) navigator.vibrate(ms);
+    }
+    function loadStart(){ seq([{f:520,d:.06,t:"triangle",g:.14},{f:600,d:.06,t:"triangle",g:.14}]); }
+    function loadOk(){ seq([{f:660,d:.07,t:"sine",g:.18},{f:880,d:.10,t:"sine",g:.20},{f:990,d:.12,t:"triangle",g:.16}]); vibrate(25); }
+    function pickVehicle(){ seq([{f:760,d:.06,t:"square",g:.10},{f:620,d:.06,t:"square",g:.10}]); vibrate(18); }
+    function newMode(){ seq([{f:540,d:.08,t:"triangle",g:.16},{f:720,d:.08,t:"triangle",g:.16}]); vibrate(20); }
+    function saveStart(){ seq([{f:420,d:.06,t:"sine",g:.16},{f:520,d:.06,t:"sine",g:.16}]); vibrate(20); }
+    function saveOk(){ seq([{f:740,d:.08,t:"sine",g:.20},{f:980,d:.10,t:"sine",g:.22},{f:1240,d:.12,t:"triangle",g:.18}]); vibrate(35); }
+    function warn(){ seq([{f:520,d:.10,t:"sawtooth",g:.12},{f:520,d:.10,t:"sawtooth",g:.12}]); vibrate(30); }
+    function error(){ seq([{f:220,d:.16,t:"sawtooth",g:.22},{f:160,d:.18,t:"sawtooth",g:.22}]); vibrate(60); }
+
+    function toggle(){
+      enabled = !enabled;
+      localStorage.setItem("vehicles_sound", enabled ? "ON" : "OFF");
+      if(enabled){ ensureCtx(); loadOk(); }
+      return enabled;
+    }
+    function isOn(){ return enabled; }
+    function unlock(){
+      if(!enabled) return;
+      ensureCtx();
+      try{ beep(1, 0.01, "sine", 0.0005); }catch(e){}
+    }
+    return { toggle, isOn, unlock, loadStart, loadOk, pickVehicle, newMode, saveStart, saveOk, warn, error };
+  })();
+
+  // ✅ زر الصوت: أيقونة فقط
+  const soundBtn = el("soundBtn");
+  function refreshSoundBtn(){
+    soundBtn.textContent = Sound.isOn() ? "🔊" : "🔇";
+    soundBtn.title = Sound.isOn() ? "الصوت شغال" : "الصوت مكتوم";
+  }
+  refreshSoundBtn();
+
+  window.addEventListener("pointerdown", ()=>Sound.unlock(), { once:true });
+  window.addEventListener("keydown", ()=>Sound.unlock(), { once:true });
+
+  soundBtn.addEventListener("click", ()=>{
+    const on = Sound.toggle();
+    refreshSoundBtn();
+    setMsg(on ? "✅ تم تشغيل الصوت" : "✅ تم كتم الصوت", on ? "ok" : "warn");
+    setTimeout(()=>{ msg.className="msg"; }, 650);
+  });
+
+  function setMsg(text,type){
+    msg.className = "msg show " + (type||"");
+    msg.textContent = text;
+    if(type === "ok") Sound.loadOk();
+    else if(type === "warn") Sound.warn();
+    else if(type === "bad") Sound.error();
+  }
+
+  function setMode(m){
+    MODE = m;
+    modeText.textContent = (m==="NEW" ? "إضافة سيارة جديدة" : "تعديل سيارة");
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  function fmtDate(val){
+    if(!val) return "—";
+    try{
+      const d = (val instanceof Date) ? val : new Date(val);
+      if(isNaN(d.getTime())) return String(val);
+      return d.toLocaleString("ar-LY");
+    }catch(e){
+      return String(val);
+    }
+  }
+
+  function resetForm(){
+    vehicle_no.value = "";
+    vehicle_name.value = "";
+    plate_no.value = "";
+    unit.value = "";
+    fuel_type.value = "";
+    driver_id.value = "";
+    driver_name_in.value = "";
+    driver_phone.value = "";
+    is_periodic.value = "";
+    periodic_mode.value = "";
+    periodic_value.value = "";
+    periodic_day.value = "";
+    active.value = "TRUE";
+    CURRENT_ID = "";
+    vidText.textContent = "—";
+    vehicle_no_search.value = "";
+    // ✅
+    createdAtText.textContent = "—";
+    createdByText.textContent = "—";
+  }
+
+  function fillPick(){
+    let html = `<option value="__NEW__">+ سيارة جديدة</option>`;
+    html += VEHICLES.map(v=>{
+      const id = String(v.vehicle_id || "");
+      const no = String(v.vehicle_no || "");
+      const name = v.vehicle_name ? ` — ${escapeHtml(v.vehicle_name)}` : "";
+      const label = `${no || ("ID:"+id)}${name}`;
+      return `<option value="${id}">${label}</option>`;
+    }).join("");
+    pick.innerHTML = html;
+    pick.value = "__NEW__";
+    setMode("NEW");
+  }
+
+  function fillVehicleNoList(){
+    const seen = new Set();
+    const opts = [];
+    VEHICLES.forEach(v=>{
+      const no = String(v.vehicle_no || "").trim();
+      if(!no || seen.has(no)) return;
+      seen.add(no);
+      const label = `${no} — ${String(v.vehicle_name||"").trim()}`;
+      opts.push(`<option value="${escapeHtml(no)}" label="${escapeHtml(label)}"></option>`);
+    });
+    vehNoList.innerHTML = opts.join("");
+  }
+
+  function applyVehicle(v){
+    setMode("EDIT");
+    CURRENT_ID = String(v.vehicle_id || "");
+    vidText.textContent = CURRENT_ID;
+
+    vehicle_no.value = v.vehicle_no || "";
+    vehicle_name.value = v.vehicle_name || "";
+    plate_no.value = v.plate_no || "";
+    unit.value = v.unit || "";
+    fuel_type.value = v.fuel_type || "";
+
+    driver_id.value = v.driver_id || "";
+    driver_name_in.value = v.driver_name || "";
+    driver_phone.value = v.driver_phone || "";
+
+    is_periodic.value = v.is_periodic || "";
+    periodic_mode.value = v.periodic_mode || "";
+    periodic_value.value = v.periodic_value || "";
+    periodic_day.value = v.periodic_day || "";
+    active.value = v.active || "TRUE";
+
+    vehicle_no_search.value = v.vehicle_no || "";
+    if(CURRENT_ID) pick.value = CURRENT_ID;
+
+    // ✅ عرض آخر تعديل
+    createdAtText.textContent = fmtDate(v.created_at);
+    createdByText.textContent = (v.created_by_name && String(v.created_by_name).trim()) ? v.created_by_name : "—";
+
+    Sound.pickVehicle();
+  }
+
+  function onPick(){
+    const val = String(pick.value || "");
+    if(val === "__NEW__"){
+      setMode("NEW");
+      resetForm();
+      Sound.newMode();
+      return;
+    }
+    const v = VEHICLES.find(x => String(x.vehicle_id) === val);
+    if(!v){ setMsg("مش لاقي السيارة المختارة.", "bad"); return; }
+    applyVehicle(v);
+    setMsg("✅ تم عرض بيانات السيارة", "ok");
+    setTimeout(()=>{ msg.className="msg"; }, 600);
+  }
+
+  function onVehicleNoSearchCommit(){
+    const no = String(vehicle_no_search.value || "").trim();
+    if(!no) return;
+
+    const v = VEHICLES.find(x => String(x.vehicle_no||"").trim() === no);
+    if(!v){
+      setMsg("❌ الرقم هذا مش موجود: " + no, "bad");
+      return;
+    }
+    applyVehicle(v);
+    setMsg("✅ تم تنزيل السيارة رقم " + no, "ok");
+    setTimeout(()=>{ msg.className="msg"; }, 900);
+  }
+
+  async function loadAll(){
+    Sound.loadStart();
+    setMsg("جاري تحميل السيارات...", "warn");
+
+    const v = await jsonp({action:"getVehicles"});
+    if(!v.ok) throw new Error(v.error || "getVehicles failed");
+
+    VEHICLES = v.vehicles || [];
+    fillPick();
+    fillVehicleNoList();
+    resetForm();
+
+    Sound.loadOk();
+    setMsg("تم التحميل ✅", "ok");
+    setTimeout(()=>{ msg.className="msg"; }, 900);
+  }
+
+  async function save(){
+    if(!vehicle_name.value.trim()){
+      setMsg("لازم تكتب اسم السيارة.", "warn");
+      return;
+    }
+    if(!vehicle_no.value.trim()){
+      setMsg("لازم تكتب رقم السيارة زي 444.", "warn");
+      return;
+    }
+
+    const payload = {
+      action: (MODE==="NEW" ? "addVehicle" : "updateVehicle"),
+      vehicle_id: (MODE==="NEW" ? "" : CURRENT_ID),
+
+      vehicle_no: vehicle_no.value.trim(),
+      vehicle_name: vehicle_name.value.trim(),
+      plate_no: plate_no.value.trim(),
+      unit: unit.value.trim(),
+      fuel_type: fuel_type.value.trim(),
+
+      driver_id: driver_id.value.trim(),
+      driver_name: driver_name_in.value.trim(),
+      driver_phone: driver_phone.value.trim(),
+
+      is_periodic: is_periodic.value.trim(),
+      periodic_mode: periodic_mode.value.trim(),
+      periodic_value: periodic_value.value.trim(),
+      periodic_day: periodic_day.value.trim(),
+      active: active.value.trim(),
+
+      // ✅ مهم: اسم اللي عدّل
+      actor_name: (user && user.full_name) ? user.full_name : ""
+    };
+
+    Sound.saveStart();
+    setMsg("جاري الحفظ...", "warn");
+
+    try{
+      const r = await jsonp(payload);
+      if(!r.ok){
+        setMsg("فشل الحفظ: " + r.error, "bad");
+        return;
+      }
+
+      Sound.saveOk();
+      setMsg("تم الحفظ ✅", "ok");
+
+      await loadAll();
+
+      // لو NEW نعرض السيارة الجديدة
+      if(MODE === "NEW" && r.vehicle_id){
+        pick.value = String(r.vehicle_id);
+        onPick();
+      } else if(MODE === "EDIT" && CURRENT_ID){
+        pick.value = String(CURRENT_ID);
+        onPick();
+      }
+
+    }catch(e){
+      setMsg("مشكلة اتصال بالـ API.", "bad");
+    }
+  }
+
+  el("newBtn").addEventListener("click", ()=>{
+    pick.value="__NEW__";
+    onPick();
+  });
+
+  pick.addEventListener("change", onPick);
+
+  vehicle_no_search.addEventListener("change", onVehicleNoSearchCommit);
+  vehicle_no_search.addEventListener("keydown", (ev)=>{
+    if(ev.key === "Enter"){
+      ev.preventDefault();
+      onVehicleNoSearchCommit();
+    }
+  });
+  vehicle_no_search.addEventListener("blur", onVehicleNoSearchCommit);
+
+  // أصوات خفيفة للتفاعل
+  document.querySelectorAll("button.btn").forEach(b=>{
+    b.addEventListener("click", ()=> Sound.pickVehicle());
+  });
+  document.querySelectorAll("input,select").forEach(x=>{
+    x.addEventListener("focus", ()=> Sound.pickVehicle());
+  });
+
+  el("saveBtn").addEventListener("click", save);
+
+  loadAll().catch(err=>{
+    setMsg("خطأ: " + err.message, "bad");
+  });
+</script>
+</body>
+</html>

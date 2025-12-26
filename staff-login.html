@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>تسجيل دخول الموظفين – منظومة الوقود</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --gold:#C9A35E; --gold2:#9E7A3A;
+      --bg0:#030712; --bg1:#071021; --bg2:#0b1630;
+      --glass:rgba(255,255,255,.06);
+      --glass2:rgba(255,255,255,.10);
+      --stroke:rgba(255,255,255,.12);
+      --strokeGold:rgba(201,163,94,.42);
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --shadow: 0 40px 140px rgba(0,0,0,.75);
+      --r:26px;
+      --good:#22c55e; --bad:#ef4444; --warn:#f59e0b;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Cairo",sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 700px at 50% 0%, rgba(201,163,94,.10), transparent 60%),
+                  radial-gradient(1100px 650px at 50% 100%, rgba(34,197,94,.07), transparent 62%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1), var(--bg2));
+      overflow:hidden;
+      position:relative;
+    }
+
+    /* ✅ خلفية متناظرة (ما تعطيش خداع بصري) */
+    .bg{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:0;
+    }
+    .bg:before{
+      content:"";
+      position:absolute; inset:-120px;
+      background:
+        radial-gradient(circle at 20% 35%, rgba(201,163,94,.16), transparent 55%),
+        radial-gradient(circle at 80% 35%, rgba(201,163,94,.16), transparent 55%),
+        radial-gradient(circle at 20% 78%, rgba(56,189,248,.08), transparent 58%),
+        radial-gradient(circle at 80% 78%, rgba(56,189,248,.08), transparent 58%);
+      filter: blur(34px);
+      opacity:.95;
+    }
+    .bg:after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 64px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 64px);
+      opacity:.06;
+      mask-image: radial-gradient(circle at 50% 50%, rgba(0,0,0,1), rgba(0,0,0,.25) 65%, transparent 85%);
+    }
+
+    /* ✅ تمركز جبري “مستحيل يميل” */
+    .stage{
+      position:fixed;
+      inset:0;
+      z-index:1;
+      padding: clamp(12px, 2.5vw, 24px);
+    }
+    .wrap{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:min(560px, 100%);
+    }
+
+    /* Card */
+    .card{
+      border-radius:var(--r);
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow:hidden;
+      position:relative;
+    }
+
+    /* خط ذهبي علوي + لمعان */
+    .card:before{
+      content:"";
+      position:absolute; inset:0 0 auto 0;
+      height:6px;
+      background: linear-gradient(90deg,
+        rgba(201,163,94,0),
+        rgba(201,163,94,.95),
+        rgba(255,255,255,.25),
+        rgba(201,163,94,.95),
+        rgba(201,163,94,0)
+      );
+      opacity:.95;
+    }
+
+    .inner{
+      padding:18px;
+    }
+
+    /* Header فخم جديد */
+    .head{
+      border-radius:20px;
+      border:1px solid rgba(201,163,94,.22);
+      background:
+        radial-gradient(520px 190px at 50% 0%, rgba(201,163,94,.16), transparent 62%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      padding:16px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .head:after{
+      content:"";
+      position:absolute; inset:-90px;
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), transparent 55%);
+      transform: rotate(12deg);
+      opacity:.55;
+      pointer-events:none;
+    }
+
+    .logoWrap{
+      width:132px; height:132px;
+      margin:0 auto 10px;
+      position:relative;
+      display:grid;
+      place-items:center;
+    }
+    .logoWrap:before{
+      content:"";
+      position:absolute; inset:-14px;
+      border-radius:40px;
+      background: conic-gradient(from 210deg,
+        rgba(201,163,94,0),
+        rgba(201,163,94,.75),
+        rgba(255,255,255,.20),
+        rgba(201,163,94,.75),
+        rgba(201,163,94,0)
+      );
+      filter: blur(14px);
+      opacity:.65;
+    }
+    .logo{
+      width:124px; height:124px;
+      border-radius:34px;
+      overflow:hidden;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(201,163,94,.62);
+      box-shadow: 0 26px 90px rgba(0,0,0,.66), 0 0 0 12px rgba(201,163,94,.08);
+      position:relative;
+      z-index:1;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+
+    .unit{
+      font-weight:900;
+      font-size:20px;
+      margin:0;
+      text-shadow:0 10px 28px rgba(0,0,0,.45);
+    }
+    .tag{
+      margin:6px 0 0;
+      font-size:12px;
+      color:rgba(203,213,225,.92);
+      line-height:1.7;
+    }
+
+    .title{
+      margin:16px 0 6px;
+      font-size:20px;
+      font-weight:900;
+    }
+    .desc{
+      margin:0 0 12px;
+      color:rgba(203,213,225,.88);
+      font-size:12px;
+      line-height:1.8;
+    }
+
+    label{
+      display:block;
+      margin:10px 0 6px;
+      color:rgba(203,213,225,.92);
+      font-size:12px;
+    }
+
+    /* Inputs */
+    .field{ position:relative; }
+    .field i{
+      position:absolute;
+      left:12px;
+      top:50%;
+      transform:translateY(-50%);
+      width:38px;height:38px;
+      border-radius:14px;
+      display:grid;place-items:center;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      color:rgba(255,255,255,.92);
+      font-style:normal;
+      font-weight:900;
+      font-size:14px;
+      pointer-events:none;
+    }
+
+    input{
+      width:100%;
+      padding:14px 58px 14px 14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      outline:none;
+      font-family:"Cairo",sans-serif;
+      font-size:14px;
+      transition:.15s ease;
+    }
+    input::placeholder{ color:rgba(203,213,225,.70); }
+    input:focus{
+      border-color: rgba(201,163,94,.70);
+      box-shadow: 0 0 0 6px rgba(201,163,94,.11);
+      background:rgba(255,255,255,.06);
+    }
+
+    /* Buttons */
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      flex:1;
+      border:none;
+      cursor:pointer;
+      padding:14px 14px;
+      border-radius:18px;
+      font-family:"Cairo",sans-serif;
+      font-weight:900;
+      font-size:14px;
+      min-height:52px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition:.15s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .btn:active{transform:translateY(1px) scale(.99)}
+
+    .gold{
+      color:#0b0b0b;
+      background: linear-gradient(135deg, var(--gold), rgba(34,197,94,.18));
+      box-shadow: 0 18px 70px rgba(201,163,94,.18), inset 0 1px 0 rgba(255,255,255,.35);
+    }
+    .gold:before{
+      content:"";
+      position:absolute; inset:-60px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), transparent 55%);
+      transform: rotate(12deg);
+      opacity:.35;
+    }
+    .gold:hover{filter:brightness(1.05)}
+
+    .ghost{
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .ghost:hover{border-color: rgba(201,163,94,.32)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed;transform:none}
+
+    /* Msg */
+    .msg{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:12px;
+      display:none;
+      line-height:1.9;
+    }
+    .msg.show{display:block}
+    .msg.ok{border-color:rgba(34,197,94,.55);color:#d1fae5}
+    .msg.bad{border-color:rgba(239,68,68,.55);color:#fee2e2}
+    .msg.warn{border-color:rgba(245,158,11,.55);color:#fff7ed}
+
+    .spinner{
+      width:16px;height:16px;border-radius:999px;
+      border:2px solid rgba(15,23,42,.25);
+      border-top-color:rgba(15,23,42,.9);
+      animation:spin .8s linear infinite;
+      display:none;
+    }
+    .loading .spinner{display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media (max-width:420px){
+      .inner{padding:14px}
+      .logoWrap{width:140px;height:140px}
+      .logo{width:132px;height:132px}
+      .title{font-size:19px}
+      .btn{min-height:50px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+
+  <div class="stage">
+    <div class="wrap">
+      <div class="card">
+        <div class="inner">
+
+          <div class="head">
+            <div class="logoWrap">
+              <div class="logo"><img src="604.png" alt="شعار اللواء"></div>
+            </div>
+            <p class="unit">اللواء 604</p>
+            <p class="tag">منظومة الوقود • تسجيل دخول الموظفين</p>
+          </div>
+
+          <div class="title">تسجيل الدخول</div>
+          <div class="desc">اكتب البيانات بدقة ثم اضغط دخول.</div>
+
+          <label>اسم المستخدم</label>
+          <div class="field">
+            <i>👤</i>
+            <input id="u" placeholder="اكتب اسم المستخدم الرسمي..." autocomplete="username">
+          </div>
+
+          <label>كلمة المرور</label>
+          <div class="field">
+            <i>🔒</i>
+            <input id="p" type="password" placeholder="اكتب كلمة المرور السرّية..." autocomplete="current-password">
+          </div>
+
+          <div class="row">
+            <button class="btn gold" id="loginBtn">
+              <span class="spinner"></span>
+              <span class="t">دخول</span>
+            </button>
+            <button class="btn ghost" onclick="location.href='home.html'">رجوع</button>
+          </div>
+
+          <div class="msg" id="msg"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbwfjjD3s2QEXsX22_oCA7x0SMMevFbG-IoWFNrFn0yfnd60ryD9PbKEXa0cM-gMMZh5/exec";
+  const DASH_PAGE = "staff.html";
+
+  // JSONP
+  function jsonp(params){
+    return new Promise((resolve, reject)=>{
+      const cb = "cb_" + Math.random().toString(36).slice(2);
+      params.callback = cb;
+      const s = document.createElement("script");
+      s.src = API_URL + "?" + new URLSearchParams(params).toString();
+      window[cb] = (data)=>{ resolve(data); delete window[cb]; s.remove(); };
+      s.onerror = ()=>{ reject(new Error("JSONP failed")); delete window[cb]; s.remove(); };
+      document.body.appendChild(s);
+    });
+  }
+
+  // أصوات
+  let audioCtx;
+  function beep(type){
+    try{
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if(type==="click"){
+        o.type="sine"; o.frequency.setValueAtTime(520, now);
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(0.12, now+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, now+0.10);
+        o.start(now); o.stop(now+0.11);
+      } else if(type==="error"){
+        o.type="square"; o.frequency.setValueAtTime(220, now);
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(0.18, now+0.03);
+        g.gain.exponentialRampToValueAtTime(0.0001, now+0.22);
+        o.start(now); o.stop(now+0.23);
+      } else if(type==="success"){
+        o.type="triangle";
+        o.frequency.setValueAtTime(440, now);
+        o.frequency.setValueAtTime(660, now+0.08);
+        o.frequency.setValueAtTime(880, now+0.16);
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(0.14, now+0.03);
+        g.gain.exponentialRampToValueAtTime(0.0001, now+0.30);
+        o.start(now); o.stop(now+0.31);
+      }
+    }catch(e){}
+  }
+
+  const u = document.getElementById("u");
+  const p = document.getElementById("p");
+  const btn = document.getElementById("loginBtn");
+  const msg = document.getElementById("msg");
+
+  function setMsg(text, type){
+    msg.className = "msg show " + (type || "");
+    msg.textContent = text;
+  }
+  function setLoading(on){
+    btn.disabled = on;
+    btn.classList.toggle("loading", on);
+    btn.querySelector(".t").textContent = on ? "جاري التحقق..." : "دخول";
+  }
+
+  const existing = JSON.parse(localStorage.getItem("fuel_user") || "null");
+  if(existing) location.href = DASH_PAGE;
+
+  async function doLogin(){
+    beep("click");
+    const username = u.value.trim();
+    const password = p.value.trim();
+
+    if(!username || !password){
+      beep("error");
+      setMsg("اكتب اسم المستخدم وكلمة المرور.", "warn");
+      return;
+    }
+
+    setLoading(true);
+    setMsg("جاري التحقق من البيانات...", "warn");
+
+    try{
+      const r = await jsonp({action:"login", username, password});
+      if(!r.ok){
+        beep("error");
+        setLoading(false);
+        setMsg(r.error === "INVALID_LOGIN" ? "بيانات الدخول غير صحيحة." : ("خطأ: " + r.error), "bad");
+        return;
+      }
+
+      beep("success");
+      localStorage.setItem("fuel_user", JSON.stringify(r.user));
+      setMsg(`تم تسجيل الدخول ✅ مرحباً ${r.user.full_name}`, "ok");
+      setTimeout(()=> location.href = DASH_PAGE, 650);
+
+    }catch(e){
+      beep("error");
+      setLoading(false);
+      setMsg("فشل الاتصال بالسيرفر. تأكد من API_URL و Deploy.", "bad");
+    }
+  }
+
+  btn.addEventListener("click", doLogin);
+  [u,p].forEach(inp => inp.addEventListener("keydown", ev => { if(ev.key==="Enter") doLogin(); }));
+</script>
+</body>
+</html>

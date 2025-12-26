@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>لوحة الموظفين – منظومة الوقود</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --gold:#C9A35E; --gold-dark:#9E7A3A;
+      --green:#1F7A3F; --green-dark:#14532D;
+      --bg-main:#0F172A;
+      --bg-card:rgba(15,23,42,.88);
+      --text-main:#F8FAFC; --text-muted:#CBD5E1;
+      --success:#1F7A3F; --danger:#B91C1C; --warning:#C9A35E;
+      --border-soft:rgba(201,163,94,.45);
+      --shadow-lg:0 20px 60px rgba(0,0,0,.6);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:"Cairo",sans-serif;direction:rtl;
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(201,163,94,.18), transparent 60%),
+        radial-gradient(1000px 500px at 80% 20%, rgba(31,122,63,.14), transparent 55%),
+        var(--bg-main);
+      color:var(--text-main);
+      min-height:100vh;padding:22px;
+    }
+    .wrap{max-width:1100px;margin:0 auto}
+    header{
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      padding:14px 16px;border:1px solid var(--border-soft);
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border-radius:16px;box-shadow:var(--shadow-lg);
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:54px;height:54px;border-radius:14px;overflow:hidden;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+      display:grid;place-items:center;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+    .title h1{margin:0;font-size:18px;font-weight:900}
+    .title p{margin:2px 0 0;color:var(--text-muted);font-size:12px}
+
+    .userbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .chip{
+      padding:8px 10px;border-radius:12px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      font-size:12px;color:var(--text-muted);
+    }
+    .btn{
+      border:none;cursor:pointer;padding:10px 12px;border-radius:12px;
+      font-family:"Cairo",sans-serif;font-weight:800;transition:.15s ease;
+    }
+    .btn:active{transform:scale(.98)}
+    .btnGold{background:var(--gold);color:#1b1b1b}
+    .btnGold:hover{background:var(--gold-dark);color:#fff}
+    .btnGreen{background:var(--green);color:#fff}
+    .btnGreen:hover{background:var(--green-dark)}
+    .btnGhost{background:transparent;color:var(--text-main);border:1px solid rgba(255,255,255,.16)}
+
+    .grid{margin-top:16px;display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+    @media(max-width:920px){.grid{grid-template-columns:1fr}}
+
+    .card{
+      background:var(--bg-card);
+      border:1px solid var(--border-soft);
+      border-radius:16px;box-shadow:var(--shadow-lg);
+      padding:14px;
+    }
+    .card h2{margin:0 0 10px;font-size:15px;display:flex;align-items:center;justify-content:space-between}
+    .hint{font-size:12px;color:var(--text-muted)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:520px){.row{grid-template-columns:1fr}}
+
+    label{display:block;margin:8px 0 6px;color:var(--text-muted);font-size:12px}
+    input,select,textarea{
+      width:100%;padding:11px 12px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text-main);outline:none;font-family:"Cairo",sans-serif;
+    }
+    textarea{min-height:90px;resize:vertical}
+    input::placeholder,textarea::placeholder{color:#9aa7ba}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .msg{
+      margin-top:10px;padding:10px 12px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.06);
+      color:var(--text-muted);font-size:12px;display:none;
+    }
+    .msg.ok{border-color:rgba(31,122,63,.55);color:#d1fae5;display:block}
+    .msg.bad{border-color:rgba(185,28,28,.55);color:#fee2e2;display:block}
+    .msg.warn{border-color:rgba(201,163,94,.55);color:#fff7ed;display:block}
+
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.10);font-size:12px}
+    th{color:#ffe9c2;text-align:right}
+    td{color:var(--text-main)}
+    .muted{color:var(--text-muted)}
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo"><img src="604.png" alt="شعار اللواء"></div>
+      <div class="title">
+        <h1>لوحة موظفي الوقود</h1>
+        <p id="welcomeLine">...</p>
+      </div>
+    </div>
+
+    <div class="userbar">
+      <div class="chip" id="userChip">...</div>
+      <button class="btn btnGold" id="btnRefresh">تحديث القوائم</button>
+      <button class="btn btnGhost" id="btnHome">الرئيسية</button>
+      <button class="btn btnGhost" id="btnLogout">خروج</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2><span>تسجيل تعبئة وقود</span><span class="hint">يتم حفظ اسم المستخدم في السجل</span></h2>
+
+      <div class="row">
+        <div>
+          <label>السيارة</label>
+          <select id="vehicleSelect"><option value="">... تحميل</option></select>
+        </div>
+        <div>
+          <label>السائق</label>
+          <select id="driverSelect"><option value="">... تحميل</option></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>الكمية (لتر)</label>
+          <input id="liters" type="number" step="0.1" min="0" placeholder="مثال: 30">
+        </div>
+        <div>
+          <label>عداد (اختياري)</label>
+          <input id="odometer" type="number" step="1" min="0" placeholder="مثال: 125000">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>التاريخ</label>
+          <input id="date" type="date">
+        </div>
+        <div>
+          <label>الوقت</label>
+          <input id="time" type="time">
+        </div>
+      </div>
+
+      <label>ملاحظة (اختياري)</label>
+      <textarea id="note" placeholder="مثال: تعبئة دورية / طارئة / سبب ..."></textarea>
+
+      <div class="actions">
+        <button class="btn btnGreen" id="btnSave">حفظ العملية</button>
+        <button class="btn btnGhost" id="btnClear">مسح الحقول</button>
+      </div>
+
+      <div class="msg" id="msgBox"></div>
+    </div>
+
+    <div class="card">
+      <h2><span>آخر عمليات التعبئة</span><span class="hint">آخر 20 سجل</span></h2>
+      <div class="actions" style="margin-top:0">
+        <button class="btn btnGold" id="btnLoadLogs">عرض آخر العمليات</button>
+      </div>
+
+      <div style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>رقم</th>
+              <th>تاريخ/وقت</th>
+              <th>لتر</th>
+              <th class="muted">السيارة</th>
+              <th class="muted">سجّلها</th>
+            </tr>
+          </thead>
+          <tbody id="logsBody">
+            <tr><td colspan="5" class="muted">اضغط "عرض آخر العمليات"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ✅ حط رابط Web App هنا (ينتهي بـ /exec) نفس اللي حطيته في staff-login.html
+  const API_URL = "https://script.google.com/macros/s/AKfycbwfjjD3s2QEXsX22_oCA7x0SMMevFbG-IoWFNrFn0yfnd60ryD9PbKEXa0cM-gMMZh5/exec";
+
+  const el = (id)=>document.getElementById(id);
+
+  // ✅ لازم يكون فيه مستخدم داخل
+  const user = JSON.parse(localStorage.getItem("fuel_user") || "null");
+  if(!user){
+    location.href = "staff-login.html";
+  }
+
+  // UI greeting
+  el("userChip").textContent = `${user.full_name} (${user.role})`;
+  el("welcomeLine").textContent = `مرحباً ${user.full_name} — جاهز لتسجيل التعبئة ومتابعة السجل.`;
+
+  // JSONP helper
+  function jsonp(params){
+    return new Promise((resolve, reject)=>{
+      const cb = "cb_" + Math.random().toString(36).slice(2);
+      params.callback = cb;
+      const q = new URLSearchParams(params).toString();
+      const s = document.createElement("script");
+      s.src = `${API_URL}?${q}`;
+
+      window[cb] = (data)=>{
+        resolve(data); delete window[cb]; s.remove();
+      };
+      s.onerror = ()=>{
+        reject(new Error("JSONP failed")); delete window[cb]; s.remove();
+      };
+      document.body.appendChild(s);
+    });
+  }
+
+  function setMsg(text, type){
+    const box = el("msgBox");
+    box.className = "msg " + (type || "");
+    box.textContent = text;
+    box.style.display = "block";
+  }
+  function clearMsg(){
+    const box = el("msgBox");
+    box.className = "msg";
+    box.textContent = "";
+    box.style.display = "none";
+  }
+
+  function todayDefaults(){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mi = String(d.getMinutes()).padStart(2,"0");
+    el("date").value = `${yyyy}-${mm}-${dd}`;
+    el("time").value = `${hh}:${mi}`;
+  }
+
+  function fillSelect(select, items, getValue, getLabel){
+    select.innerHTML = `<option value="">اختر...</option>`;
+    items.forEach(it=>{
+      const opt = document.createElement("option");
+      opt.value = getValue(it);
+      opt.textContent = getLabel(it);
+      select.appendChild(opt);
+    });
+  }
+
+  async function loadLists(){
+    clearMsg();
+    try{
+      const v = await jsonp({action:"getVehicles"});
+      if(!v.ok){ setMsg("خطأ تحميل السيارات: " + v.error, "bad"); return; }
+
+      const d = await jsonp({action:"getDrivers"});
+      if(!d.ok){ setMsg("خطأ تحميل السائقين: " + d.error, "bad"); return; }
+
+      fillSelect(el("vehicleSelect"), v.vehicles || [], x=>x.vehicle_id,
+        x=>`${x.vehicle_name}${x.plate_no ? " - "+x.plate_no : ""}${x.unit ? " ("+x.unit+")" : ""}`
+      );
+      fillSelect(el("driverSelect"), d.drivers || [], x=>x.driver_id,
+        x=>`${x.driver_name}${x.unit ? " ("+x.unit+")" : ""}`
+      );
+
+      setMsg("تم تحديث القوائم ✅", "ok");
+      setTimeout(clearMsg, 1200);
+    }catch(e){
+      setMsg("فشل الاتصال بالسيرفر. تأكد من API_URL و Deploy.", "bad");
+    }
+  }
+
+  async function saveFuel(){
+    clearMsg();
+
+    const payload = {
+      vehicle_id: el("vehicleSelect").value,
+      driver_id: el("driverSelect").value,
+      liters: Number(el("liters").value || 0),
+      odometer: el("odometer").value,
+      date: el("date").value,
+      time: el("time").value,
+      note: el("note").value.trim(),
+      // ✅ تتبع من الذي سجّل
+      created_by: user.username
+      // لو تبّي نسجل الاسم أيضاً، نزيد عمود في FuelLog ونرسله created_by_name
+    };
+
+    if(!payload.vehicle_id || !payload.driver_id || !payload.date || !payload.time){
+      setMsg("كمّل البيانات الأساسية (سيارة/سائق/تاريخ/وقت).", "warn"); return;
+    }
+    if(!(payload.liters > 0)){
+      setMsg("أدخل كمية صحيحة باللتر.", "warn"); return;
+    }
+
+    try{
+      const r = await jsonp({action:"addFuelLog", ...payload});
+      if(!r.ok){
+        setMsg("فشل الحفظ: " + r.error, "bad"); return;
+      }
+
+      setMsg(`تم حفظ العملية ✅ رقم السجل: ${r.log_id} (باسم: ${user.full_name})`, "ok");
+      el("liters").value = "";
+      el("odometer").value = "";
+      el("note").value = "";
+      todayDefaults();
+      await loadLogs();
+    }catch(e){
+      setMsg("فشل الاتصال أثناء الحفظ. تأكد من API_URL.", "bad");
+    }
+  }
+
+  async function loadLogs(){
+    const body = el("logsBody");
+    body.innerHTML = `<tr><td colspan="5" class="muted">تحميل...</td></tr>`;
+    try{
+      const r = await jsonp({action:"getLastLogs", limit:20});
+      if(!r.ok){
+        body.innerHTML = `<tr><td colspan="5" class="muted">خطأ: ${r.error}</td></tr>`;
+        return;
+      }
+      const logs = r.logs || [];
+      if(!logs.length){
+        body.innerHTML = `<tr><td colspan="5" class="muted">لا توجد سجلات بعد.</td></tr>`;
+        return;
+      }
+      body.innerHTML = "";
+      logs.forEach(x=>{
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${x.log_id}</td>
+          <td class="muted">${x.date} - ${x.time}</td>
+          <td>${x.liters}</td>
+          <td class="muted">${x.vehicle_id}</td>
+          <td class="muted">${x.created_by || "-"}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }catch(e){
+      body.innerHTML = `<tr><td colspan="5" class="muted">فشل الاتصال بالسيرفر.</td></tr>`;
+    }
+  }
+
+  // buttons
+  el("btnRefresh").addEventListener("click", loadLists);
+  el("btnSave").addEventListener("click", saveFuel);
+  el("btnLoadLogs").addEventListener("click", loadLogs);
+
+  el("btnClear").addEventListener("click", ()=>{
+    el("vehicleSelect").value = "";
+    el("driverSelect").value = "";
+    el("liters").value = "";
+    el("odometer").value = "";
+    el("note").value = "";
+    todayDefaults();
+    clearMsg();
+  });
+
+  el("btnLogout").addEventListener("click", ()=>{
+    localStorage.removeItem("fuel_user");
+    location.href = "staff-login.html";
+  });
+
+  el("btnHome").addEventListener("click", ()=> location.href="home.html");
+
+  // init
+  todayDefaults();
+  loadLists();
+</script>
+</body>
+</html>
